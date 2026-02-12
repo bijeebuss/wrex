@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 ## Current Position
 
 Phase: 2 of 3 (Memory Pipeline)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: Executing Phase 2
-Last activity: 2026-02-12 -- Completed 02-01 (Embedding Service and Markdown Chunker)
+Last activity: 2026-02-12 -- Completed 02-02 (SQLite Storage and Hybrid Search)
 
-Progress: [████░░░░░░] 38%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 8min
-- Total execution time: 0.37 hours
+- Total plans completed: 4
+- Average duration: 7min
+- Total execution time: 0.45 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 2/2 | 19min | 10min |
-| 02-memory-pipeline | 1/3 | 3min | 3min |
+| 02-memory-pipeline | 2/3 | 8min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (7min), 01-02 (12min), 02-01 (3min)
+- Last 5 plans: 01-01 (7min), 01-02 (12min), 02-01 (3min), 02-02 (5min)
 - Trend: Accelerating
 
 *Updated after each plan completion*
@@ -52,6 +52,10 @@ Recent decisions affecting current work:
 - Sequential embedding in embedBatch (node-llama-cpp context handles one request at a time)
 - Concurrent-safe singleton init for embedder using shared promise to prevent duplicate model loading
 - stderr-only logging in embedder module to preserve MCP stdio transport
+- CAST(? AS INTEGER) workaround for sqlite-vec vec0 primary key binding in better-sqlite3
+- Buffer.from(Float32Array) instead of raw ArrayBuffer for better-sqlite3 vec0 inserts
+- Application-level FTS5 sync (explicit INSERT in transaction) instead of triggers
+- Expanded result sets (limit*2) for each sub-search before RRF fusion
 
 ### Pending Todos
 
@@ -64,5 +68,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Completed 02-01-PLAN.md
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None

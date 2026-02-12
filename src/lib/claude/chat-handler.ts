@@ -7,12 +7,14 @@
  * 3. NDJSON events are parsed and forwarded as SSE data lines
  * 4. On client disconnect, the Claude process is killed
  */
+import path from 'node:path'
 import { z } from 'zod'
 import { eq } from 'drizzle-orm'
 import { db } from '@/lib/db/index'
 import { sessions, messages } from '@/lib/db/schema'
 import { processManager } from '@/lib/claude/process-manager'
 import { parseNDJSON } from '@/lib/claude/ndjson-parser'
+import { hybridSearch } from '@/lib/memory/search'
 import type { ClaudeEvent, SystemEvent, ResultEvent } from '@/lib/claude/types'
 
 /**
@@ -82,6 +84,32 @@ export async function handleChatRequest(request: Request): Promise<Response> {
       })
       .run()
 
+    // Search memory for relevant context (non-fatal if it fails)
+    let memoryContext: { filePath: string; heading: string; content: string; startLine: number; endLine: number }[] = []
+    let systemPromptAppend = ''
+    try {
+      const results = await hybridSearch(prompt, 3)
+      if (results.length > 0) {
+        memoryContext = results.map(r => ({
+          filePath: r.filePath,
+          heading: r.heading,
+          content: r.content,
+          startLine: r.startLine,
+          endLine: r.endLine,
+        }))
+        const contextSnippets = results.map(r =>
+          `[${r.filePath}:${r.startLine}-${r.endLine}] ${r.heading}\n${r.content}`
+        ).join('\n\n---\n\n')
+        systemPromptAppend = `\n\nRelevant memory context from prior sessions:\n${contextSnippets}`
+      }
+    } catch (err) {
+      console.error('[chat] Memory search failed (non-fatal):', err)
+      // Continue without memory context
+    }
+
+    // Resolve MCP config path (always pass for memory tool access)
+    const mcpConfigPath = path.resolve('.mcp.json')
+
     const encoder = new TextEncoder()
 
     // Create the SSE streaming response
@@ -92,10 +120,22 @@ export async function handleChatRequest(request: Request): Promise<Response> {
           encoder.encode(`data: ${JSON.stringify({ type: 'session', sessionId })}\n\n`),
         )
 
+        // Send memory context as second event (before Claude starts streaming)
+        if (memoryContext.length > 0) {
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({
+              type: 'memory_context',
+              snippets: memoryContext,
+            })}\n\n`),
+          )
+        }
+
         let child: ReturnType<typeof processManager.spawn>
         try {
           child = processManager.spawn(sessionId, prompt, {
             resumeSessionId: claudeResumeSessionId,
+            appendSystemPrompt: systemPromptAppend || undefined,
+            mcpConfigPath,
           })
         } catch (err) {
           const message = err instanceof Error ? err.message : 'Failed to spawn Claude process'

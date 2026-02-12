@@ -31,3 +31,16 @@ export const messages = sqliteTable('messages', {
     .notNull()
     .default(sql`(unixepoch() * 1000)`),
 })
+
+export const memoryChunks = sqliteTable('memory_chunks', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  filePath: text('file_path').notNull(),
+  heading: text('heading').notNull().default(''),
+  content: text('content').notNull(),
+  startLine: integer('start_line').notNull(),
+  endLine: integer('end_line').notNull(),
+  embeddingHash: text('embedding_hash'),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch() * 1000)`),
+})

@@ -8,10 +8,15 @@ import type { ChatMessage } from '@/types/chat'
 
 export const Route = createFileRoute('/_chat/$sessionId')({
   loader: async ({ params }) => {
-    const data = await loadSessionMessages({
-      data: { sessionId: params.sessionId },
-    })
-    return data
+    try {
+      const data = await loadSessionMessages({
+        data: { sessionId: params.sessionId },
+      })
+      return data
+    } catch {
+      // Session doesn't exist yet (new chat with pre-generated ID)
+      return { id: params.sessionId, title: null, claudeSessionId: null, messages: [] }
+    }
   },
   component: ChatSession,
 })

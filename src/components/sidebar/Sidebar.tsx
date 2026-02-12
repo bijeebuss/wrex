@@ -1,4 +1,5 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { useCallback } from 'react'
 import { SessionItem } from './SessionItem'
 import type { SessionListItem } from '@/lib/api/sessions'
 
@@ -10,6 +11,20 @@ interface SidebarProps {
 }
 
 export function Sidebar({ sessions, isOpen, onToggle, onDelete }: SidebarProps) {
+  const navigate = useNavigate()
+
+  const handleNewChat = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
+      const newId = crypto.randomUUID()
+      navigate({ to: '/$sessionId', params: { sessionId: newId } })
+      if (typeof window !== 'undefined' && window.innerWidth < 768) {
+        onToggle()
+      }
+    },
+    [navigate, onToggle],
+  )
+
   return (
     <>
       {/* Mobile backdrop */}
@@ -30,15 +45,10 @@ export function Sidebar({ sessions, isOpen, onToggle, onDelete }: SidebarProps) 
       >
         {/* Header with New Chat button */}
         <div className="shrink-0 p-3 border-b border-gray-200 dark:border-gray-800">
-          <Link
-            to="/"
-            className="flex items-center justify-center gap-2 w-full px-3 py-2 rounded-lg bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
-            onClick={() => {
-              // Close sidebar only on mobile
-              if (typeof window !== 'undefined' && window.innerWidth < 768) {
-                onToggle()
-              }
-            }}
+          <a
+            href="/"
+            className="flex items-center justify-center gap-2 w-full px-3 py-2 rounded-lg bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors cursor-pointer"
+            onClick={handleNewChat}
           >
             <svg
               className="w-4 h-4"
@@ -50,7 +60,7 @@ export function Sidebar({ sessions, isOpen, onToggle, onDelete }: SidebarProps) 
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
             New chat
-          </Link>
+          </a>
         </div>
 
         {/* Session list */}

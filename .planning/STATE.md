@@ -9,29 +9,30 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 
 ## Current Position
 
-Phase: 1 of 3 (Foundation and CLI Integration)
-Plan: 2 of 2 in current phase (PHASE COMPLETE)
-Status: Phase 1 Complete
-Last activity: 2026-02-12 -- Completed 01-02 (CLI Integration)
+Phase: 2 of 3 (Memory Pipeline)
+Plan: 1 of 3 in current phase
+Status: Executing Phase 2
+Last activity: 2026-02-12 -- Completed 02-01 (Embedding Service and Markdown Chunker)
 
-Progress: [███░░░░░░░] 33%
+Progress: [████░░░░░░] 38%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 10min
-- Total execution time: 0.32 hours
+- Total plans completed: 3
+- Average duration: 8min
+- Total execution time: 0.37 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 2/2 | 19min | 10min |
+| 02-memory-pipeline | 1/3 | 3min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (7min), 01-02 (12min)
-- Trend: Stable
+- Last 5 plans: 01-01 (7min), 01-02 (12min), 02-01 (3min)
+- Trend: Accelerating
 
 *Updated after each plan completion*
 
@@ -48,6 +49,9 @@ Recent decisions affecting current work:
 - No createServerFileRoute API in TanStack Start v1.159.5; intercepted /api/chat in server.tsx fetch handler instead
 - Chat handler in src/lib/claude/ (not routes/api/) to avoid TanStack Router file scanning warnings
 - Drizzle relational queries use .sync() for synchronous better-sqlite3 execution
+- Sequential embedding in embedBatch (node-llama-cpp context handles one request at a time)
+- Concurrent-safe singleton init for embedder using shared promise to prevent duplicate model loading
+- stderr-only logging in embedder module to preserve MCP stdio transport
 
 ### Pending Todos
 
@@ -60,5 +64,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Completed 01-02-PLAN.md (Phase 1 complete)
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None

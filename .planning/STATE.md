@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-12)
 
 **Core value:** A conversational AI assistant with persistent, searchable memory -- so every session builds on everything that came before.
-**Current focus:** Phase 3: Chat Experience (Plan 02 complete, 1 remaining)
+**Current focus:** Phase 3: Chat Experience (Plan 03 complete, awaiting human verification)
 
 ## Current Position
 
 Phase: 3 of 3 (Chat Experience)
-Plan: 2 of 3 in current phase -- COMPLETE
-Status: Executing Phase 3
-Last activity: 2026-02-12 -- Completed 03-02 (Session Management & Sidebar)
+Plan: 3 of 3 in current phase -- AWAITING VERIFICATION
+Status: Checkpoint: human-verify for 03-03
+Last activity: 2026-02-12 -- Completed 03-03 auto tasks (Memory Injection & Tool Visibility)
 
-Progress: [█████████░] 88%
+Progress: [██████████] 97%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
-- Average duration: 6min
-- Total execution time: 0.65 hours
+- Total plans completed: 8
+- Average duration: 5min
+- Total execution time: 0.70 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [█████████░] 88%
 |-------|-------|-------|----------|
 | 01-foundation | 2/2 | 19min | 10min |
 | 02-memory-pipeline | 3/3 | 12min | 4min |
-| 03-chat-experience | 2/3 | 8min | 4min |
+| 03-chat-experience | 3/3 | 11min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (3min), 02-02 (5min), 02-03 (4min), 03-01 (4min), 03-02 (4min)
+- Last 5 plans: 02-02 (5min), 02-03 (4min), 03-01 (4min), 03-02 (4min), 03-03 (3min)
 - Trend: Accelerating
 
 *Updated after each plan completion*
@@ -67,6 +67,9 @@ Recent decisions affecting current work:
 - Raw SQL with ROW_NUMBER() window function for efficient last-message-per-session query instead of Drizzle relations
 - Fixed-position sidebar with margin-based content offset for smooth open/close transitions
 - Pathless layout (_chat prefix) wraps all routes without URL segment
+- Non-fatal memory search: hybridSearch failure does not block chat (graceful degradation)
+- Always pass --mcp-config on every spawn including resumes for consistent tool access
+- Memory context sent as SSE event before Claude stream starts for immediate display
 
 ### Pending Todos
 
@@ -79,5 +82,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Completed 03-02-PLAN.md
+Stopped at: Checkpoint: human-verify for 03-03-PLAN.md (Tasks 1-2 complete, Task 3 awaiting verification)
 Resume file: None

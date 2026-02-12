@@ -13,7 +13,7 @@ Wrex delivers a web-based conversational AI assistant with persistent memory in 
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation and CLI Integration** - Server skeleton, database, and Claude Code process manager
-- [ ] **Phase 2: Memory Pipeline** - Embedding, hybrid search, and MCP memory tools
+- [x] **Phase 2: Memory Pipeline** - Embedding, hybrid search, and MCP memory tools
 - [ ] **Phase 3: Chat Experience** - Streaming UI, session management, and memory-augmented conversations
 
 ## Phase Details
@@ -46,9 +46,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: Embedding service (node-llama-cpp + nomic-embed model) and markdown chunker
-- [ ] 02-02: SQLite vector storage (sqlite-vec) and FTS5 indexing with hybrid search (RRF scoring)
-- [ ] 02-03: MCP memory server exposing memory_search, memory_get, and memory_write tools
+- [x] 02-01: Embedding service (node-llama-cpp + nomic-embed model) and markdown chunker
+- [x] 02-02: SQLite vector storage (sqlite-vec) and FTS5 indexing with hybrid search (RRF scoring)
+- [x] 02-03: MCP memory server exposing memory_search, memory_get, and memory_write tools
 
 ### Phase 3: Chat Experience
 **Goal**: Users can have streaming conversations with Claude through the browser, manage sessions, see tool usage, and benefit from automatic memory context -- the full end-to-end product
@@ -75,7 +75,7 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation and CLI Integration | 2/2 | Complete | 2026-02-12 |
-| 2. Memory Pipeline | 0/3 | Not started | - |
+| 2. Memory Pipeline | 3/3 | Complete | 2026-02-12 |
 | 3. Chat Experience | 0/3 | Not started | - |
 
 ---

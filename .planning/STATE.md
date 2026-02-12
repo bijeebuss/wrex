@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-12)
 
 **Core value:** A conversational AI assistant with persistent, searchable memory -- so every session builds on everything that came before.
-**Current focus:** Phase 3: Chat Experience
+**Current focus:** Phase 3: Chat Experience (Plan 01 complete, 2 remaining)
 
 ## Current Position
 
-Phase: 2 of 3 (Memory Pipeline) -- COMPLETE
-Plan: 3 of 3 in current phase -- COMPLETE
-Status: Phase 2 Complete, ready for Phase 3
-Last activity: 2026-02-12 -- Completed 02-03 (MCP Server)
+Phase: 3 of 3 (Chat Experience)
+Plan: 1 of 3 in current phase -- COMPLETE
+Status: Executing Phase 3
+Last activity: 2026-02-12 -- Completed 03-01 (Streaming Chat UI)
 
-Progress: [███████░░░] 67%
+Progress: [████████░░] 75%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: 7min
-- Total execution time: 0.52 hours
+- Total plans completed: 6
+- Average duration: 6min
+- Total execution time: 0.58 hours
 
 **By Phase:**
 
@@ -29,9 +29,10 @@ Progress: [███████░░░] 67%
 |-------|-------|-------|----------|
 | 01-foundation | 2/2 | 19min | 10min |
 | 02-memory-pipeline | 3/3 | 12min | 4min |
+| 03-chat-experience | 1/3 | 4min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (7min), 01-02 (12min), 02-01 (3min), 02-02 (5min), 02-03 (4min)
+- Last 5 plans: 01-02 (12min), 02-01 (3min), 02-02 (5min), 02-03 (4min), 03-01 (4min)
 - Trend: Accelerating
 
 *Updated after each plan completion*
@@ -58,6 +59,10 @@ Recent decisions affecting current work:
 - Expanded result sets (limit*2) for each sub-search before RRF fusion
 - Dedicated script file (src/scripts/index-memory.ts) instead of tsx -e inline to avoid CJS top-level-await limitation
 - stderr-only logging throughout MCP server and all imported memory modules to preserve stdio JSON-RPC transport
+- requestAnimationFrame batching for text delta updates to prevent render thrashing during fast token streaming
+- Replaced findLastIndex with manual loop for ES2022 target compatibility (tsconfig targets ES2022)
+- Tailwind v4 CSS variable theming with bg-(--color-name) syntax for chat bubble colors
+- React.memo with custom comparator on ChatMessage to prevent re-renders of non-streaming messages
 
 ### Pending Todos
 
@@ -70,5 +75,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Completed 02-03-PLAN.md (Phase 2 complete)
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None

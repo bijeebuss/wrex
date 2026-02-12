@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-02-12)
 
 **Core value:** A conversational AI assistant with persistent, searchable memory -- so every session builds on everything that came before.
-**Current focus:** Phase 1: Foundation and CLI Integration
+**Current focus:** Phase 2: Memory Pipeline
 
 ## Current Position
 

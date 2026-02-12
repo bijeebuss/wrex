@@ -12,7 +12,7 @@ Wrex delivers a web-based conversational AI assistant with persistent memory in 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation and CLI Integration** - Server skeleton, database, and Claude Code process manager
+- [x] **Phase 1: Foundation and CLI Integration** - Server skeleton, database, and Claude Code process manager
 - [ ] **Phase 2: Memory Pipeline** - Embedding, hybrid search, and MCP memory tools
 - [ ] **Phase 3: Chat Experience** - Streaming UI, session management, and memory-augmented conversations
 
@@ -31,8 +31,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: TanStack Start skeleton with SQLite database setup (Drizzle ORM, sqlite-vec, FTS5, session schema)
-- [ ] 01-02: Claude Code process manager with NDJSON stream parsing and SSE bridge to browser
+- [x] 01-01: TanStack Start skeleton with SQLite database setup (Drizzle ORM, sqlite-vec, FTS5, session schema)
+- [x] 01-02: Claude Code process manager with NDJSON stream parsing and SSE bridge to browser
 
 ### Phase 2: Memory Pipeline
 **Goal**: A complete memory system where markdown files are chunked, embedded locally, indexed for hybrid search, and exposed as MCP tools that Claude Code can call
@@ -74,7 +74,7 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation and CLI Integration | 0/2 | Not started | - |
+| 1. Foundation and CLI Integration | 2/2 | Complete | 2026-02-12 |
 | 2. Memory Pipeline | 0/3 | Not started | - |
 | 3. Chat Experience | 0/3 | Not started | - |
 

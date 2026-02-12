@@ -1,15 +1,17 @@
-import type { ChatMessage as ChatMessageType, ChatStatus } from '../../types/chat'
+import type { ChatMessage as ChatMessageType, ChatStatus, MemorySnippet } from '../../types/chat'
 import { ChatMessage } from './ChatMessage'
+import { MemoryContext } from './MemoryContext'
 import { LoadingIndicator } from '../ui/LoadingIndicator'
 import { useAutoScroll } from '../../hooks/useAutoScroll'
 
 interface ChatMessagesProps {
   messages: ChatMessageType[]
   status: ChatStatus
+  memoryContext?: MemorySnippet[] | null
   onRetry: () => void
 }
 
-export function ChatMessages({ messages, status, onRetry }: ChatMessagesProps) {
+export function ChatMessages({ messages, status, memoryContext, onRetry }: ChatMessagesProps) {
   const isStreaming = status === 'streaming'
   const { containerRef, showScrollButton, scrollToBottom, latestMessageRef } = useAutoScroll({
     messages,
@@ -33,6 +35,9 @@ export function ChatMessages({ messages, status, onRetry }: ChatMessagesProps) {
         className="h-full overflow-y-auto px-4 py-6"
       >
         <div className="max-w-3xl mx-auto">
+          {memoryContext && memoryContext.length > 0 && (
+            <MemoryContext snippets={memoryContext} />
+          )}
           {messages.length === 0 && (
             <div className="flex items-center justify-center h-full min-h-[200px]">
               <div className="text-center text-gray-400 dark:text-gray-600">

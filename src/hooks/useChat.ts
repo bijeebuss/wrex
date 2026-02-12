@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import type { ChatMessage, ChatStatus, ToolCallState } from '../types/chat'
+import type { ChatMessage, ChatStatus, ToolCallState, MemorySnippet } from '../types/chat'
 
 interface UseChatOptions {
   sessionId?: string
@@ -11,6 +11,7 @@ interface UseChatReturn {
   messages: ChatMessage[]
   status: ChatStatus
   error: string | null
+  memoryContext: MemorySnippet[] | null
   sendMessage: (text: string) => void
   stopStreaming: () => void
   retryLast: () => void
@@ -25,6 +26,7 @@ export function useChat(opts: UseChatOptions = {}): UseChatReturn {
   const [messages, setMessages] = useState<ChatMessage[]>(opts.initialMessages ?? [])
   const [status, setStatus] = useState<ChatStatus>('idle')
   const [error, setError] = useState<string | null>(null)
+  const [memoryContext, setMemoryContext] = useState<MemorySnippet[] | null>(null)
 
   const sessionIdRef = useRef<string | undefined>(opts.sessionId)
   const queueRef = useRef<string[]>([])
@@ -166,6 +168,11 @@ export function useChat(opts: UseChatOptions = {}): UseChatReturn {
             if (event.type === 'session' && event.sessionId) {
               sessionIdRef.current = event.sessionId
               onSessionCreatedRef.current?.(event.sessionId)
+            }
+
+            // Memory context event
+            if (event.type === 'memory_context' && event.snippets) {
+              setMemoryContext(event.snippets)
             }
 
             // Stream event handling
@@ -392,5 +399,5 @@ export function useChat(opts: UseChatOptions = {}): UseChatReturn {
     }
   }, [])
 
-  return { messages, status, error, sendMessage, stopStreaming, retryLast }
+  return { messages, status, error, memoryContext, sendMessage, stopStreaming, retryLast }
 }

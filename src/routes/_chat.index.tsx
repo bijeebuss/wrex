@@ -21,13 +21,13 @@ function NewChat() {
     [navigate, router],
   )
 
-  const { messages, status, sendMessage, stopStreaming, retryLast } = useChat({
+  const { messages, status, memoryContext, sendMessage, stopStreaming, retryLast } = useChat({
     onSessionCreated: handleSessionCreated,
   })
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <ChatMessages messages={messages} status={status} onRetry={retryLast} />
+      <ChatMessages messages={messages} status={status} memoryContext={memoryContext} onRetry={retryLast} />
       <ChatInput
         onSend={sendMessage}
         onStop={stopStreaming}

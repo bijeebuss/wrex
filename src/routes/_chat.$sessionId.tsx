@@ -37,7 +37,7 @@ function ChatSession() {
     router.invalidate()
   }, [router])
 
-  const { messages, status, sendMessage, stopStreaming, retryLast } = useChat({
+  const { messages, status, memoryContext, sendMessage, stopStreaming, retryLast } = useChat({
     sessionId,
     initialMessages,
     onSessionCreated: handleSessionCreated,
@@ -45,7 +45,7 @@ function ChatSession() {
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <ChatMessages messages={messages} status={status} onRetry={retryLast} />
+      <ChatMessages messages={messages} status={status} memoryContext={memoryContext} onRetry={retryLast} />
       <ChatInput
         onSend={sendMessage}
         onStop={stopStreaming}

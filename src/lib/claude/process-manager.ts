@@ -42,6 +42,10 @@ export class ClaudeProcessManager {
       // detached: false (the default) -- child is part of same process group
     })
 
+    // Close stdin immediately -- Claude CLI with -p flag doesn't need stdin,
+    // but will hang waiting for it to close if left open.
+    child.stdin.end()
+
     this.processes.set(sessionId, child)
 
     child.once('exit', () => {

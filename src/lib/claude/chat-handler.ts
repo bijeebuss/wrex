@@ -15,6 +15,18 @@ import { processManager } from '@/lib/claude/process-manager'
 import { parseNDJSON } from '@/lib/claude/ndjson-parser'
 import type { ClaudeEvent, SystemEvent, ResultEvent } from '@/lib/claude/types'
 
+/**
+ * Auto-generate a title from the first user message.
+ * Trims to 50 chars at the last word boundary.
+ */
+function generateTitle(firstMessage: string): string {
+  const maxLen = 50
+  if (firstMessage.length <= maxLen) return firstMessage
+  const trimmed = firstMessage.slice(0, maxLen)
+  const lastSpace = trimmed.lastIndexOf(' ')
+  return (lastSpace > 20 ? trimmed.slice(0, lastSpace) : trimmed) + '...'
+}
+
 const chatRequestSchema = z.object({
   prompt: z.string().min(1, 'Prompt must not be empty'),
   sessionId: z.string().optional(),
@@ -46,9 +58,16 @@ export async function handleChatRequest(request: Request): Promise<Response> {
 
     if (existingSession) {
       claudeResumeSessionId = existingSession.claudeSessionId ?? undefined
+      // Defensive: if existing session has no title, generate one
+      if (!existingSession.title) {
+        db.update(sessions)
+          .set({ title: generateTitle(prompt) })
+          .where(eq(sessions.id, sessionId))
+          .run()
+      }
     } else {
       db.insert(sessions)
-        .values({ id: sessionId, status: 'active' })
+        .values({ id: sessionId, status: 'active', title: generateTitle(prompt) })
         .run()
     }
 
@@ -176,7 +195,7 @@ export async function handleChatRequest(request: Request): Promise<Response> {
           })
         }
 
-        // Handle process exit with non-zero code
+        // Handle process exit
         child.on('exit', (code: number | null, signal: string | null) => {
           if (code !== null && code !== 0) {
             try {
@@ -192,13 +211,27 @@ export async function handleChatRequest(request: Request): Promise<Response> {
             } catch {
               // Controller might be already closed
             }
+          } else if (code === null && signal) {
+            // Process killed by signal without producing result
+            try {
+              controller.enqueue(
+                encoder.encode(
+                  `data: ${JSON.stringify({
+                    type: 'error',
+                    error: `Claude process killed by signal: ${signal}`,
+                  })}\n\n`,
+                ),
+              )
+              controller.close()
+            } catch {
+              // Controller might be already closed
+            }
           }
         })
       },
 
       cancel() {
         // Client disconnected -- kill the Claude process
-        console.log(`[chat] Client disconnected, killing session ${sessionId}`)
         processManager.kill(sessionId)
       },
     })

@@ -1,7 +1,7 @@
 # Requirements: Wrex
 
 **Defined:** 2026-02-12
-**Core Value:** A conversational AI assistant with persistent, searchable memory — so every session builds on everything that came before.
+**Core Value:** A conversational AI assistant with persistent, searchable memory -- so every session builds on everything that came before.
 
 ## v1 Requirements
 
@@ -48,19 +48,19 @@ Deferred to future release. Tracked but not in current roadmap.
 
 ### Memory Enhancements
 
-- **MEM-08**: Memory compaction — persist important information before context window fills
-- **MEM-09**: Session-to-memory extraction — automatically extract key decisions/facts after sessions
-- **MEM-10**: Memory browser UI — browse, read, edit, and organize memory files in the web interface
+- **MEM-08**: Memory compaction -- persist important information before context window fills
+- **MEM-09**: Session-to-memory extraction -- automatically extract key decisions/facts after sessions
+- **MEM-10**: Memory browser UI -- browse, read, edit, and organize memory files in the web interface
 
 ### Chat Enhancements
 
-- **CHAT-08**: File diff display — show before/after diffs inline when Claude edits files
-- **CHAT-09**: Keyboard shortcuts — Cmd+K for new session, Cmd+/ for search
+- **CHAT-08**: File diff display -- show before/after diffs inline when Claude edits files
+- **CHAT-09**: Keyboard shortcuts -- Cmd+K for new session, Cmd+/ for search
 
 ### Project Management
 
-- **PROJ-01**: Project/workspace context — associate sessions with specific project directories
-- **PROJ-02**: Configurable tool permissions — per-project permission profiles
+- **PROJ-01**: Project/workspace context -- associate sessions with specific project directories
+- **PROJ-02**: Configurable tool permissions -- per-project permission profiles
 
 ## Out of Scope
 
@@ -68,8 +68,8 @@ Explicitly excluded. Documented to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| Multi-provider support | Claude only, via Claude Code CLI — architecture decision |
-| Multi-user / authentication | Single user on dedicated VM — use network-level access control |
+| Multi-provider support | Claude only, via Claude Code CLI -- architecture decision |
+| Multi-user / authentication | Single user on dedicated VM -- use network-level access control |
 | Docker/containerization | Runs directly on VM |
 | Channel integrations (Slack, Discord) | Web UI only |
 | Voice input/output | Target user is a developer who types |
@@ -86,35 +86,35 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CHAT-01 | — | Pending |
-| CHAT-02 | — | Pending |
-| CHAT-03 | — | Pending |
-| CHAT-04 | — | Pending |
-| CHAT-05 | — | Pending |
-| CHAT-06 | — | Pending |
-| CHAT-07 | — | Pending |
-| SESS-01 | — | Pending |
-| SESS-02 | — | Pending |
-| SESS-03 | — | Pending |
-| SESS-04 | — | Pending |
-| MEM-01 | — | Pending |
-| MEM-02 | — | Pending |
-| MEM-03 | — | Pending |
-| MEM-04 | — | Pending |
-| MEM-05 | — | Pending |
-| MEM-06 | — | Pending |
-| MEM-07 | — | Pending |
-| INFR-01 | — | Pending |
-| INFR-02 | — | Pending |
-| INFR-03 | — | Pending |
-| INFR-04 | — | Pending |
-| INFR-05 | — | Pending |
+| CHAT-01 | Phase 3 | Pending |
+| CHAT-02 | Phase 3 | Pending |
+| CHAT-03 | Phase 3 | Pending |
+| CHAT-04 | Phase 3 | Pending |
+| CHAT-05 | Phase 3 | Pending |
+| CHAT-06 | Phase 3 | Pending |
+| CHAT-07 | Phase 3 | Pending |
+| SESS-01 | Phase 3 | Pending |
+| SESS-02 | Phase 3 | Pending |
+| SESS-03 | Phase 3 | Pending |
+| SESS-04 | Phase 3 | Pending |
+| MEM-01 | Phase 2 | Pending |
+| MEM-02 | Phase 2 | Pending |
+| MEM-03 | Phase 2 | Pending |
+| MEM-04 | Phase 2 | Pending |
+| MEM-05 | Phase 2 | Pending |
+| MEM-06 | Phase 2 | Pending |
+| MEM-07 | Phase 3 | Pending |
+| INFR-01 | Phase 1 | Pending |
+| INFR-02 | Phase 1 | Pending |
+| INFR-03 | Phase 1 | Pending |
+| INFR-04 | Phase 1 | Pending |
+| INFR-05 | Phase 1 | Pending |
 
 **Coverage:**
 - v1 requirements: 23 total
-- Mapped to phases: 0
-- Unmapped: 23 ⚠️
+- Mapped to phases: 23
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-12*
-*Last updated: 2026-02-12 after initial definition*
+*Last updated: 2026-02-12 after roadmap creation*

@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-12)
 
 **Core value:** A conversational AI assistant with persistent, searchable memory -- so every session builds on everything that came before.
-**Current focus:** Phase 3: Chat Experience (Plan 01 complete, 2 remaining)
+**Current focus:** Phase 3: Chat Experience (Plan 02 complete, 1 remaining)
 
 ## Current Position
 
 Phase: 3 of 3 (Chat Experience)
-Plan: 1 of 3 in current phase -- COMPLETE
+Plan: 2 of 3 in current phase -- COMPLETE
 Status: Executing Phase 3
-Last activity: 2026-02-12 -- Completed 03-01 (Streaming Chat UI)
+Last activity: 2026-02-12 -- Completed 03-02 (Session Management & Sidebar)
 
-Progress: [████████░░] 75%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: 6min
-- Total execution time: 0.58 hours
+- Total execution time: 0.65 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [████████░░] 75%
 |-------|-------|-------|----------|
 | 01-foundation | 2/2 | 19min | 10min |
 | 02-memory-pipeline | 3/3 | 12min | 4min |
-| 03-chat-experience | 1/3 | 4min | 4min |
+| 03-chat-experience | 2/3 | 8min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (12min), 02-01 (3min), 02-02 (5min), 02-03 (4min), 03-01 (4min)
+- Last 5 plans: 02-01 (3min), 02-02 (5min), 02-03 (4min), 03-01 (4min), 03-02 (4min)
 - Trend: Accelerating
 
 *Updated after each plan completion*
@@ -63,6 +63,10 @@ Recent decisions affecting current work:
 - Replaced findLastIndex with manual loop for ES2022 target compatibility (tsconfig targets ES2022)
 - Tailwind v4 CSS variable theming with bg-(--color-name) syntax for chat bubble colors
 - React.memo with custom comparator on ChatMessage to prevent re-renders of non-streaming messages
+- TanStack Start createServerFn for session CRUD (RPC-style, no manual API routes needed)
+- Raw SQL with ROW_NUMBER() window function for efficient last-message-per-session query instead of Drizzle relations
+- Fixed-position sidebar with margin-based content offset for smooth open/close transitions
+- Pathless layout (_chat prefix) wraps all routes without URL segment
 
 ### Pending Todos
 
@@ -75,5 +79,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Completed 03-01-PLAN.md
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None

@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, useRouter } from '@tanstack/react-router'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Sidebar } from '@/components/sidebar/Sidebar'
 import { listSessions, deleteSession } from '@/lib/api/sessions'
 
@@ -15,11 +15,14 @@ function ChatLayout() {
   const { sessions } = Route.useLoaderData()
   const router = useRouter()
 
-  // Default: open on md+ screens, closed on mobile (SSR-safe default: true)
-  const [isOpen, setIsOpen] = useState(() => {
-    if (typeof window === 'undefined') return true
-    return window.innerWidth >= 768
-  })
+  // SSR-safe: always start true (matches server render), then adjust after hydration
+  const [isOpen, setIsOpen] = useState(true)
+
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      setIsOpen(false)
+    }
+  }, [])
 
   const handleToggle = useCallback(() => {
     setIsOpen((prev) => !prev)

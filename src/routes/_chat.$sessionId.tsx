@@ -21,7 +21,13 @@ export const Route = createFileRoute('/_chat/$sessionId')({
   component: ChatSession,
 })
 
+// Wrapper that keys on sessionId to force full remount (resets all hook state)
 function ChatSession() {
+  const { sessionId } = Route.useParams()
+  return <ChatSessionInner key={sessionId} />
+}
+
+function ChatSessionInner() {
   const { sessionId } = Route.useParams()
   const loaderData = Route.useLoaderData()
   const router = useRouter()

@@ -23,7 +23,9 @@ export class ClaudeProcessManager {
     opts?: {
       resumeSessionId?: string
       appendSystemPrompt?: string
+      systemPrompt?: string
       mcpConfigPath?: string
+      cwd?: string
     },
   ): ChildProcess {
     const args = [
@@ -40,6 +42,10 @@ export class ClaudeProcessManager {
       args.push('--resume', opts.resumeSessionId)
     }
 
+    if (opts?.systemPrompt) {
+      args.push('--system-prompt', opts.systemPrompt)
+    }
+
     if (opts?.appendSystemPrompt) {
       args.push('--append-system-prompt', opts.appendSystemPrompt)
     }
@@ -51,7 +57,7 @@ export class ClaudeProcessManager {
     const child = spawn('claude', args, {
       stdio: ['pipe', 'pipe', 'pipe'],
       env: { ...process.env },
-      // detached: false (the default) -- child is part of same process group
+      cwd: opts?.cwd,
     })
 
     // Close stdin immediately -- Claude CLI with -p flag doesn't need stdin,

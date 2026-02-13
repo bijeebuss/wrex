@@ -1,25 +1,27 @@
 /**
- * Bootstrap script: indexes all markdown files in the memory/ directory.
+ * Bootstrap script: indexes all markdown files in the memory directory.
  *
  * Usage: npx tsx src/scripts/index-memory.ts
+ *
+ * Uses MEMORY_DIR env var or defaults to ./data/workspace/memory.
  *
  * IMPORTANT: Uses console.error for all output (this script may be invoked
  * in contexts where stdout is reserved).
  */
 
 import { readdirSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { indexFile, ensureTables } from "../lib/memory/indexer.js";
 import { disposeEmbedder } from "../lib/memory/embedder.js";
 
 async function main() {
   ensureTables();
 
-  const dir = "./memory";
+  const dir = resolve(process.env.MEMORY_DIR || "./data/workspace/memory");
   const files = readdirSync(dir).filter((f) => f.endsWith(".md"));
 
   if (files.length === 0) {
-    console.error("No markdown files found in memory/ directory.");
+    console.error(`No markdown files found in ${dir}.`);
     process.exit(0);
   }
 
@@ -30,7 +32,7 @@ async function main() {
   }
 
   console.error(
-    `Indexed ${totalChunks} chunks from ${files.length} file(s).`,
+    `Indexed ${totalChunks} chunks from ${files.length} file(s) in ${dir}.`,
   );
 
   await disposeEmbedder();

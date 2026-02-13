@@ -1,8 +1,9 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useChat } from '@/hooks/useChat'
 import { ChatMessages } from '@/components/chat/ChatMessages'
 import { ChatInput } from '@/components/chat/ChatInput'
+import { useTextToSpeech } from '@/hooks/useTextToSpeech'
 import { loadSessionMessages } from '@/lib/api/sessions'
 import type { ChatMessage } from '@/types/chat'
 
@@ -54,6 +55,15 @@ function ChatSessionInner() {
     onSessionCreated: handleSessionCreated,
   })
 
+  const [isListening, setIsListening] = useState(false)
+
+  // Get the last assistant message's content for TTS
+  const lastMsg = messages[messages.length - 1]
+  const ttsContent = lastMsg?.role === 'assistant' ? lastMsg.content : ''
+  const ttsStreaming = lastMsg?.role === 'assistant' && !!lastMsg.isStreaming
+
+  useTextToSpeech(ttsContent, ttsStreaming, isListening)
+
   return (
     <div className="flex flex-col flex-1 min-h-0">
       <ChatMessages messages={messages} status={status} memoryContext={memoryContext} onRetry={retryLast} />
@@ -61,6 +71,7 @@ function ChatSessionInner() {
         onSend={sendMessage}
         onStop={stopStreaming}
         isStreaming={status === 'streaming'}
+        onListeningChange={setIsListening}
       />
     </div>
   )

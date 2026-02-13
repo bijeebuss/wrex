@@ -12,7 +12,8 @@
     "db:studio": "drizzle-kit studio",
     "models:pull": "npx node-llama-cpp pull --dir ./models hf:nomic-ai/nomic-embed-text-v1.5-GGUF:Q8_0",
     "mcp:dev": "npx tsx src/mcp-server.ts",
-    "memory:index": "npx tsx src/scripts/index-memory.ts"
+    "memory:index": "npx tsx src/scripts/index-memory.ts",
+    "memory:clear": "npx tsx src/scripts/clear-memory.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",

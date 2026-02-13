@@ -50,7 +50,7 @@ function ChatLayout() {
       >
         {/* Header bar */}
         <header className="shrink-0 border-b border-gray-200 dark:border-gray-800 px-4 py-3">
-          <div className="max-w-3xl mx-auto flex items-center gap-3">
+          <div className="max-w-5xl mx-auto flex items-center gap-3">
             {/* Hamburger toggle */}
             <button
               type="button"

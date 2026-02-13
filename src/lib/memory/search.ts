@@ -241,17 +241,26 @@ export async function hybridSearch(
     sourceMap.get(r.id)!.add("keyword");
   }
 
-  // Sort by RRF score descending, take top `limit`
+  // Sort by RRF score descending
   const ranked = [...scores.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, limit);
+    .sort((a, b) => b[1] - a[1]);
 
-  return ranked.map(([id, score]) => {
+  // Deduplicate by content location (same heading + line range = same chunk,
+  // even if indexed under different file path variants)
+  const seen = new Set<string>();
+  const deduped: SearchResult[] = [];
+  for (const [id, score] of ranked) {
     const base = resultMap.get(id)!;
-    return {
+    const key = `${base.heading}:${base.startLine}-${base.endLine}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push({
       ...base,
       score,
       sources: [...sourceMap.get(id)!],
-    };
-  });
+    });
+    if (deduped.length >= limit) break;
+  }
+
+  return deduped;
 }

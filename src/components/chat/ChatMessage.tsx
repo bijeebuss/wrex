@@ -29,7 +29,11 @@ function ChatMessageInner({ message, onRetry }: ChatMessageProps) {
     )
   }
 
-  // Assistant message
+  // Assistant message — hide bubble until there's content to show
+  if (!message.content && (!message.toolCalls || message.toolCalls.length === 0)) {
+    return null
+  }
+
   return (
     <div className="flex justify-start mb-4">
       <div className="max-w-[80%] rounded-2xl px-4 py-3 bg-(--color-claude-bubble-light) dark:bg-(--color-claude-bubble)">

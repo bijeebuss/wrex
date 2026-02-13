@@ -13,7 +13,7 @@ interface ChatMessagesProps {
 
 export function ChatMessages({ messages, status, memoryContext, onRetry }: ChatMessagesProps) {
   const isStreaming = status === 'streaming'
-  const { containerRef, showScrollButton, scrollToBottom, latestMessageRef } = useAutoScroll({
+  const { containerRef, showScrollButton, scrollToBottom, latestMessageRef, topSentinelRef } = useAutoScroll({
     messages,
     isStreaming,
   })
@@ -34,7 +34,7 @@ export function ChatMessages({ messages, status, memoryContext, onRetry }: ChatM
         ref={containerRef}
         className="h-full overflow-y-auto px-4 py-6"
       >
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           {memoryContext && memoryContext.length > 0 && (
             <MemoryContext snippets={memoryContext} />
           )}
@@ -50,6 +50,9 @@ export function ChatMessages({ messages, status, memoryContext, onRetry }: ChatM
               key={msg.id}
               ref={idx === lastAssistantIdx ? latestMessageRef : undefined}
             >
+              {idx === lastAssistantIdx && (
+                <div ref={topSentinelRef} style={{ height: 0, overflow: 'hidden' }} />
+              )}
               <ChatMessage message={msg} onRetry={onRetry} />
             </div>
           ))}

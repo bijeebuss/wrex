@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import path from "node:path";
 import type Database from "better-sqlite3";
 import { sqlite } from "../db/index";
 import { chunkMarkdown } from "./chunker";
@@ -117,6 +118,7 @@ function getStatements() {
  */
 export async function indexFile(filePath: string): Promise<number> {
   ensureTables();
+  filePath = path.resolve(filePath);
 
   const content = readFileSync(filePath, "utf-8");
   const chunks = chunkMarkdown(content, filePath);
@@ -175,6 +177,7 @@ export async function indexFile(filePath: string): Promise<number> {
  */
 export function removeFileIndex(filePath: string): void {
   ensureTables();
+  filePath = path.resolve(filePath);
 
   const stmts = getStatements();
 

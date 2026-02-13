@@ -8,7 +8,7 @@ export function MemoryContext({ snippets }: MemoryContextProps) {
   if (snippets.length === 0) return null
 
   return (
-    <div className="mx-auto max-w-2xl mb-4">
+    <div className="mx-auto max-w-5xl mb-4">
       <details className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 overflow-hidden">
         <summary className="px-4 py-2.5 cursor-pointer flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/50 list-none [&::-webkit-details-marker]:hidden">
           <svg

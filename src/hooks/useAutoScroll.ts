@@ -11,11 +11,13 @@ interface UseAutoScrollReturn {
   showScrollButton: boolean
   scrollToBottom: () => void
   latestMessageRef: React.RefObject<HTMLDivElement | null>
+  topSentinelRef: React.RefObject<HTMLDivElement | null>
 }
 
 export function useAutoScroll({ messages, isStreaming }: UseAutoScrollOptions): UseAutoScrollReturn {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const latestMessageRef = useRef<HTMLDivElement | null>(null)
+  const topSentinelRef = useRef<HTMLDivElement | null>(null)
   const [showScrollButton, setShowScrollButton] = useState(false)
   const isAutoScrollEnabled = useRef(true)
   const lastScrollTop = useRef(0)
@@ -37,14 +39,16 @@ export function useAutoScroll({ messages, isStreaming }: UseAutoScrollOptions): 
     prevMessageCount.current = currentCount
   }, [messages.length])
 
-  // Set up IntersectionObserver on the latest assistant message sentinel
+  // Set up IntersectionObserver on a zero-height sentinel at the top of the latest assistant message.
+  // We observe the sentinel (not the full message div) because the message div grows during streaming
+  // and its bottom is always visible — so with threshold:0 it would always be "intersecting".
+  // The sentinel becomes not-intersecting only when the message top scrolls past the container top.
   useEffect(() => {
-    if (!latestMessageRef.current || !containerRef.current) return
+    if (!topSentinelRef.current || !containerRef.current) return
 
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          // When the top of the latest message exits the viewport (scrolled past top), stop auto-scroll
           if (!entry.isIntersecting && isStreaming) {
             isAutoScrollEnabled.current = false
           }
@@ -57,7 +61,7 @@ export function useAutoScroll({ messages, isStreaming }: UseAutoScrollOptions): 
       },
     )
 
-    observer.observe(latestMessageRef.current)
+    observer.observe(topSentinelRef.current)
     return () => observer.disconnect()
   }, [messages.length, isStreaming])
 
@@ -105,5 +109,5 @@ export function useAutoScroll({ messages, isStreaming }: UseAutoScrollOptions): 
     setShowScrollButton(false)
   }, [])
 
-  return { containerRef, showScrollButton, scrollToBottom, latestMessageRef }
+  return { containerRef, showScrollButton, scrollToBottom, latestMessageRef, topSentinelRef }
 }

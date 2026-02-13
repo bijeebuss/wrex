@@ -15,7 +15,11 @@ import { sessions, messages } from '@/lib/db/schema'
 import { processManager } from '@/lib/claude/process-manager'
 import { parseNDJSON } from '@/lib/claude/ndjson-parser'
 import { hybridSearch } from '@/lib/memory/search'
-import type { ClaudeEvent, SystemEvent, ResultEvent } from '@/lib/claude/types'
+import { buildSystemPrompt } from '@/lib/claude/system-prompt'
+import { hasMemories } from '@/lib/workspace/init'
+import type { ClaudeEvent, SystemEvent, StreamEvent, ResultEvent } from '@/lib/claude/types'
+
+const workspaceDir = path.resolve('data/workspace')
 
 /**
  * Auto-generate a title from the first user message.
@@ -107,8 +111,38 @@ export async function handleChatRequest(request: Request): Promise<Response> {
       // Continue without memory context
     }
 
+    // Detect /init command or first-time user (no memories) for onboarding
+    const isInitCommand = prompt.trim().toLowerCase() === '/init'
+    const isFirstTime = !claudeResumeSessionId && !hasMemories()
+
+    if (isInitCommand || isFirstTime) {
+      systemPromptAppend += `\n\n# Onboarding
+
+The user is ${isInitCommand ? 're-running onboarding' : 'new — this is their first conversation'}.
+Start a friendly onboarding conversation to learn about them.
+
+**Rules:**
+- Ask questions ONE AT A TIME. Do not present a list of questions.
+- Be conversational and warm, not robotic or formal.
+- Start by introducing yourself briefly and asking their name.
+- Over subsequent messages, naturally gather:
+  - Their name
+  - What they do (role, occupation, field)
+  - What they're currently working on / interested in
+  - How they prefer to communicate (concise vs. detailed, casual vs. formal)
+- After each answer, save what you've learned using **memory_write**:
+  - Save profile info to \`memory/user-profile.md\`
+  - Save project/work context to \`memory/projects.md\`
+- Don't wait until the end — save incrementally as you learn things.
+- Keep the conversation flowing naturally; 3–5 exchanges is a good length.
+${isInitCommand ? '- The user already has memories. Merge new info with existing files rather than overwriting.' : ''}`
+    }
+
     // Resolve MCP config path (always pass for memory tool access)
     const mcpConfigPath = path.resolve('.mcp.json')
+
+    // Build the system prompt
+    const systemPrompt = buildSystemPrompt({ workspaceDir })
 
     const encoder = new TextEncoder()
 
@@ -134,8 +168,10 @@ export async function handleChatRequest(request: Request): Promise<Response> {
         try {
           child = processManager.spawn(sessionId, prompt, {
             resumeSessionId: claudeResumeSessionId,
+            systemPrompt,
             appendSystemPrompt: systemPromptAppend || undefined,
             mcpConfigPath,
+            cwd: workspaceDir,
           })
         } catch (err) {
           const message = err instanceof Error ? err.message : 'Failed to spawn Claude process'
@@ -145,6 +181,11 @@ export async function handleChatRequest(request: Request): Promise<Response> {
           controller.close()
           return
         }
+
+        // Accumulate streamed text server-side so we can persist it.
+        // The result event's `result` field can be empty for tool-use responses,
+        // but the actual text is streamed via content_block_delta events.
+        let accumulatedText = ''
 
         // Parse NDJSON from Claude's stdout
         if (child.stdout) {
@@ -158,6 +199,18 @@ export async function handleChatRequest(request: Request): Promise<Response> {
                 )
               } catch {
                 // Controller might be closed if client disconnected
+              }
+
+              // Accumulate text from stream deltas for DB persistence
+              if (event.type === 'stream_event') {
+                const payload = (event as StreamEvent).event
+                if (
+                  payload.type === 'content_block_delta' &&
+                  payload.delta?.type === 'text_delta' &&
+                  payload.delta.text
+                ) {
+                  accumulatedText += payload.delta.text
+                }
               }
 
               // Extract Claude session_id from system init event
@@ -184,7 +237,7 @@ export async function handleChatRequest(request: Request): Promise<Response> {
                       id: crypto.randomUUID(),
                       sessionId,
                       role: 'assistant',
-                      content: resultEvent.result || '',
+                      content: resultEvent.result || accumulatedText,
                       costUsd: resultEvent.total_cost_usd
                         ? Math.round(resultEvent.total_cost_usd * 1_000_000)
                         : null,

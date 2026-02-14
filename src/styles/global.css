@@ -7,4 +7,32 @@
   --color-claude-bubble: #2d3748;
   --color-user-bubble-light: #e3effd;
   --color-claude-bubble-light: #f0f4f8;
+
+  /* Streamdown code-block expects these shadcn-style tokens */
+  --color-border: #e2e8f0;
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+}
+
+/* Dark-mode overrides for code blocks.
+   Shiki sets --shiki-dark / --shiki-dark-bg as inline styles on each token/pre,
+   but Tailwind's scanner may fail to extract the complex dark: arbitrary-value
+   classes from the minified Streamdown bundle. Write the rules explicitly. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-border: #334155;
+    --color-muted: #1e293b;
+    --color-muted-foreground: #94a3b8;
+  }
+
+  /* Code block background: use Shiki dark-bg, fallback to GitHub dark */
+  [data-streamdown="code-block-body"] {
+    background-color: var(--shiki-dark-bg, #0d1117) !important;
+    color: var(--shiki-dark, #e6edf3) !important;
+  }
+
+  /* Individual tokens: use Shiki dark color set as inline --shiki-dark */
+  [data-streamdown="code-block-body"] code span span {
+    color: var(--shiki-dark, inherit) !important;
+  }
 }

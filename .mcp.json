@@ -3,6 +3,13 @@
     "wrex-memory": {
       "type": "http",
       "url": "http://localhost:55520/api/mcp"
+    },
+    "playwright": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "npx @playwright/mcp@latest --user-data-dir \"$HOME/.browser-profile\""
+      ]
     }
   }
 }

@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { useChat } from '@/hooks/useChat'
 import { ChatMessages } from '@/components/chat/ChatMessages'
 import { ChatInput } from '@/components/chat/ChatInput'
+import { ContextBar } from '@/components/chat/ContextBar'
 import { useTextToSpeech } from '@/hooks/useTextToSpeech'
 import { loadSessionMessages } from '@/lib/api/sessions'
 import type { ChatMessage } from '@/types/chat'
@@ -49,7 +50,7 @@ function ChatSessionInner() {
     router.invalidate()
   }, [router])
 
-  const { messages, status, memoryContext, sendMessage, stopStreaming, retryLast } = useChat({
+  const { messages, status, memoryContext, contextUsage, sendMessage, stopStreaming, retryLast } = useChat({
     sessionId,
     initialMessages,
     onSessionCreated: handleSessionCreated,
@@ -67,6 +68,7 @@ function ChatSessionInner() {
   return (
     <div className="flex flex-col flex-1 min-h-0">
       <ChatMessages messages={messages} status={status} memoryContext={memoryContext} onRetry={retryLast} />
+      <ContextBar contextUsage={contextUsage} />
       <ChatInput
         onSend={sendMessage}
         onStop={stopStreaming}

@@ -16,6 +16,11 @@ export interface ToolCallState {
 
 export type ChatStatus = 'idle' | 'streaming' | 'done' | 'error'
 
+export interface ContextUsage {
+  inputTokens: number
+  outputTokens: number
+}
+
 export interface MemorySnippet {
   filePath: string
   heading: string

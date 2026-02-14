@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import type { ChatMessage, ChatStatus, ToolCallState, MemorySnippet } from '../types/chat'
+import type { ChatMessage, ChatStatus, ToolCallState, MemorySnippet, ContextUsage } from '../types/chat'
 
 interface UseChatOptions {
   sessionId?: string
@@ -12,6 +12,7 @@ interface UseChatReturn {
   status: ChatStatus
   error: string | null
   memoryContext: MemorySnippet[] | null
+  contextUsage: ContextUsage | null
   sendMessage: (text: string) => void
   stopStreaming: () => void
   retryLast: () => void
@@ -27,6 +28,7 @@ export function useChat(opts: UseChatOptions = {}): UseChatReturn {
   const [status, setStatus] = useState<ChatStatus>('idle')
   const [error, setError] = useState<string | null>(null)
   const [memoryContext, setMemoryContext] = useState<MemorySnippet[] | null>(null)
+  const [contextUsage, setContextUsage] = useState<ContextUsage | null>(null)
 
   const sessionIdRef = useRef<string | undefined>(opts.sessionId)
   const queueRef = useRef<string[]>([])
@@ -253,6 +255,17 @@ export function useChat(opts: UseChatOptions = {}): UseChatReturn {
 
             // Result event
             if (event.type === 'result') {
+              // Capture context usage (sum all input token types for true context fill)
+              if (event.usage) {
+                const u = event.usage
+                setContextUsage({
+                  inputTokens:
+                    (u.input_tokens ?? 0) +
+                    (u.cache_creation_input_tokens ?? 0) +
+                    (u.cache_read_input_tokens ?? 0),
+                  outputTokens: u.output_tokens ?? 0,
+                })
+              }
               // Flush any remaining text
               flushText()
               setMessages(prev => {
@@ -399,5 +412,5 @@ export function useChat(opts: UseChatOptions = {}): UseChatReturn {
     }
   }, [])
 
-  return { messages, status, error, memoryContext, sendMessage, stopStreaming, retryLast }
+  return { messages, status, error, memoryContext, contextUsage, sendMessage, stopStreaming, retryLast }
 }

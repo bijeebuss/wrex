@@ -38,7 +38,7 @@ function ChatMessageInner({ message, onRetry }: ChatMessageProps) {
     <div className="flex justify-start mb-4">
       <div className="max-w-[80%] rounded-2xl px-4 py-3 bg-(--color-claude-bubble-light) dark:bg-(--color-claude-bubble)">
         {message.content && (
-          <div className="text-[15px] leading-relaxed text-gray-900 dark:text-gray-100 prose dark:prose-invert max-w-none prose-pre:bg-gray-100 dark:prose-pre:bg-gray-900 prose-code:text-sm">
+          <div className="text-[15px] leading-relaxed text-gray-900 dark:text-gray-100 prose dark:prose-invert max-w-none prose-code:text-sm">
             <Streamdown
               plugins={plugins}
               isAnimating={message.isStreaming}

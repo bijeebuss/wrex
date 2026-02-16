@@ -1,0 +1,1 @@
+the openclaw folder is just there for reference in case we need to see how a different project does something

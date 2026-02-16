@@ -115,6 +115,42 @@ function memoryRecallSection(): string[] {
   ];
 }
 
+function selfTriggerSection(): string[] {
+  return [
+    "# Self-Triggering",
+    "",
+    "You can start a new conversation with yourself by sending a POST request to your own chat endpoint.",
+    "This is useful for scheduling recurring tasks with cron jobs or systemd timers.",
+    "",
+    "```bash",
+    "printf '{\"prompt\":\"your message here\"}' | curl -s -X POST http://localhost:55520/api/chat \\",
+    "  -H 'Content-Type: application/json' -d @-",
+    "```",
+    "",
+    "The response is an SSE stream. For fire-and-forget jobs that don't need the response,",
+    "pipe to /dev/null or use `--max-time` to set a timeout:",
+    "",
+    "```bash",
+    "printf '{\"prompt\":\"check disk usage and alert me if above 80%%\"}' | \\",
+    "  curl -s --max-time 300 -X POST http://localhost:55520/api/chat \\",
+    "  -H 'Content-Type: application/json' -d @- > /dev/null 2>&1",
+    "```",
+    "",
+    "**Important:** Always use `printf '...' | curl -d @-` to avoid shell quoting issues.",
+    "Do NOT put JSON directly in the `-d` argument — nested quotes get mangled.",
+    "",
+    "You can use this to set up systemd timers, cron jobs, or any scheduled automation.",
+    "For example, to create a cron job that runs daily:",
+    "",
+    "```bash",
+    "# Add to crontab with: crontab -e",
+    "0 9 * * * printf '{\"prompt\":\"good morning, check my reminders and give me a daily briefing\"}' | curl -s --max-time 300 -X POST http://localhost:55520/api/chat -H 'Content-Type: application/json' -d @- > /dev/null 2>&1",
+    "```",
+    "",
+    "When the user asks you to set up a scheduled task, create the cron job or systemd timer yourself using your Bash tool.",
+  ];
+}
+
 function workspaceSection(workspaceDir: string): string[] {
   return [
     "# Workspace",
@@ -138,6 +174,7 @@ export function buildSystemPrompt(params: SystemPromptParams): string {
     operatingContextSection(),
     toolUsageSection(params.toolNames),
     memoryRecallSection(),
+    selfTriggerSection(),
     workspaceSection(params.workspaceDir),
   ];
 

@@ -4,6 +4,14 @@ A personal AI assistant with persistent memory, built as a web UI on top of [Cla
 
 Wrex remembers your conversations, preferences, and context across sessions using a hybrid search system (vector similarity + full-text keyword search) backed by SQLite.
 
+## Quick Install
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/bijeebuss/wrex/main/install.sh | bash
+```
+
+Set `WREX_DIR` to customize the install location (defaults to `~/wrex`).
+
 ## Prerequisites
 
 - **Node.js** >= 22

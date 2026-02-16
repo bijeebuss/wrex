@@ -29,8 +29,6 @@ export class ClaudeProcessManager {
     },
   ): ChildProcess {
     const args = [
-      '-p',
-      prompt,
       '--output-format',
       'stream-json',
       '--verbose',
@@ -60,9 +58,9 @@ export class ClaudeProcessManager {
       cwd: opts?.cwd,
     })
 
-    // Close stdin immediately -- Claude CLI with -p flag doesn't need stdin,
-    // but will hang waiting for it to close if left open.
-    child.stdin.end()
+    // Pipe the prompt via stdin instead of -p to avoid quoting/encoding issues
+    // with special characters in CLI arguments.
+    child.stdin.end(prompt)
 
     this.processes.set(sessionId, child)
 

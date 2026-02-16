@@ -6,14 +6,10 @@
  * and are auto-discovered by Claude CLI via its cwd.
  */
 
-const BUILTIN_SERVERS = {
+const BUILTIN_SERVERS: Record<string, Record<string, unknown>> = {
   'wrex-memory': {
     type: 'http',
     url: 'http://localhost:55520/api/mcp',
-  },
-  playwright: {
-    command: 'bash',
-    args: ['-c', 'npx @playwright/mcp@latest --user-data-dir "$HOME/.browser-profile"'],
   },
 }
 

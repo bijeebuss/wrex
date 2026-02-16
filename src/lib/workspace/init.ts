@@ -5,6 +5,7 @@
  * existing files are never overwritten, so user edits are preserved.
  */
 import { existsSync, mkdirSync, writeFileSync, readdirSync, statSync } from 'node:fs'
+import { execSync } from 'node:child_process'
 import { resolve, join, extname } from 'node:path'
 
 const workspaceDir = resolve('data/workspace')
@@ -40,7 +41,8 @@ This is your personal workspace. You have full control over it.
 data/workspace/
 ├── .mcp.json             ← user MCP servers (e.g. todoist) — edit to add/remove
 ├── .claude/
-│   └── CLAUDE.md         ← this file (identity + workspace conventions)
+│   ├── CLAUDE.md         ← this file (identity + workspace conventions)
+│   └── skills/           ← CLI skills (e.g. playwright-cli)
 ├── memory/               ← persistent memory files (managed via MCP tools)
 │   ├── user-profile.md   ← who you're talking to
 │   ├── projects.md       ← active projects & context
@@ -84,6 +86,17 @@ export function ensureWorkspace(): void {
   if (!existsSync(mcpJsonPath)) {
     writeFileSync(mcpJsonPath, USER_MCP_TEMPLATE, 'utf-8')
     console.log('[workspace] Seeded .mcp.json')
+  }
+
+  // Install playwright-cli skills if not already present
+  const skillsDir = join(workspaceDir, '.claude', 'skills')
+  if (!existsSync(skillsDir) || readdirSync(skillsDir).length === 0) {
+    try {
+      execSync('playwright-cli install --skills', { cwd: workspaceDir, stdio: 'pipe' })
+      console.log('[workspace] Installed playwright-cli skills')
+    } catch (err) {
+      console.error('[workspace] Failed to install playwright-cli skills (is @playwright/cli installed?):', err)
+    }
   }
 }
 

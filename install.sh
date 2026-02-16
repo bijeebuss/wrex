@@ -54,6 +54,16 @@ npm run models:pull
 info "Setting up database..."
 npm run db:push
 
+info "Installing Playwright CLI..."
+npm install -g @playwright/cli@latest
+
+if ls "$HOME/.cache/ms-playwright"/chromium-* &>/dev/null; then
+  info "Playwright browser already installed, skipping."
+else
+  info "Installing browser dependencies..."
+  npx playwright install --with-deps chromium
+fi
+
 # --- done ---
 
 info "Install complete!"

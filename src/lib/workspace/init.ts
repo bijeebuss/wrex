@@ -22,12 +22,11 @@ This is your personal workspace. You have full control over it.
 \`\`\`
 data/workspace/
 ├── .claude/
-│   └── CLAUDE.md        ← this file (workspace conventions)
+│   └── CLAUDE.md        ← this file (identity + workspace conventions)
 ├── memory/              ← persistent memory files (managed via MCP tools)
 │   ├── user-profile.md  ← who you're talking to
 │   ├── projects.md      ← active projects & context
 │   └── ...              ← any topic-based files you create
-└── SOUL.md              ← (optional) personality override
 \`\`\`
 
 ## Commands
@@ -61,6 +60,7 @@ export function ensureWorkspace(): void {
     writeFileSync(claudeMdPath, CLAUDE_MD_TEMPLATE, 'utf-8')
     console.log('[workspace] Seeded .claude/CLAUDE.md')
   }
+
 }
 
 /**

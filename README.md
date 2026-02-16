@@ -4,19 +4,22 @@ A personal AI assistant with persistent memory, built as a web UI on top of [Cla
 
 Wrex remembers your conversations, preferences, and context across sessions using a hybrid search system (vector similarity + full-text keyword search) backed by SQLite.
 
-## Quick Install
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/bijeebuss/wrex/main/install.sh | bash
-```
-
-Set `WREX_DIR` to customize the install location (defaults to `~/wrex`).
-
 ## Prerequisites
 
 - **Node.js** >= 22
 - **Claude Code CLI** >= 2.1 — installed and authenticated (`claude --version` to verify)
 - An active **Anthropic API key** or Claude subscription configured in the CLI
+
+### Installing Node.js
+
+The recommended way to install Node.js is via [nvm](https://github.com/nvm-sh/nvm):
+
+```sh
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+nvm install 22
+```
+
+Alternatively, download directly from [nodejs.org](https://nodejs.org/).
 
 ### Installing Claude Code CLI
 
@@ -29,6 +32,15 @@ Then authenticate:
 ```sh
 claude login
 ```
+
+## Quick Install
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/bijeebuss/wrex/main/install.sh | bash
+```
+
+Set `WREX_DIR` to customize the install location (defaults to `~/wrex`).
+
 
 ## Setup
 

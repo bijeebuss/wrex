@@ -9,7 +9,7 @@
  * so we cherry-pick the tool usage guidance we want to keep.
  */
 
-import { existsSync, readFileSync } from "node:fs";
+import { readdirSync } from "node:fs";
 import { resolve, join } from "node:path";
 
 export interface SystemPromptParams {
@@ -21,17 +21,7 @@ export interface SystemPromptParams {
 // Section builders
 // ---------------------------------------------------------------------------
 
-function identitySection(workspaceDir: string): string[] {
-  const soulPath = resolve(join(workspaceDir, "SOUL.md"));
-  if (existsSync(soulPath)) {
-    try {
-      const soul = readFileSync(soulPath, "utf-8").trim();
-      return [soul];
-    } catch {
-      // Fall through to default
-    }
-  }
-
+function identitySection(): string[] {
   return [
     "You are Wrex, a personal AI assistant with persistent memory.",
     "You remember prior conversations and preferences through your memory system.",
@@ -67,7 +57,7 @@ function toolUsageSection(toolNames?: string[]): string[] {
     ...mcpDescriptions,
     "",
     "## Built-in Tools",
-    "You also have built-in tools for interacting with your workspace:",
+    "You also have built-in tools for interacting with the filesystem:",
     "- **Read**: Read file contents. Use this instead of cat/head/tail.",
     "- **Write**: Create or overwrite a file. Read existing files before overwriting.",
     "- **Edit**: Make targeted string replacements in files. Use instead of sed/awk. Read a file before editing it.",
@@ -152,15 +142,47 @@ function selfTriggerSection(): string[] {
 }
 
 function workspaceSection(workspaceDir: string): string[] {
+  // Snapshot the workspace contents so Wrex knows what's there
+  let listing = "";
+  const absWorkspace = resolve(workspaceDir);
+  try {
+    const entries = readdirSync(absWorkspace, { withFileTypes: true });
+    listing = entries
+      .map((e) => `  ${e.isDirectory() ? e.name + "/" : e.name}`)
+      .join("\n");
+  } catch {
+    listing = "  (unable to read directory)";
+  }
+
+  // Resolve the app source directory (one level up from data/workspace)
+  const appDir = resolve(absWorkspace, "../..");
+
   return [
     "# Workspace",
     "",
-    `Your working directory is: ${workspaceDir}`,
+    `Your working directory is: ${absWorkspace}`,
     "This is your personal workspace, separate from the application code.",
     "Use it for memory files, notes, and any artifacts you create.",
     "",
+    "Current contents:",
+    listing,
+    "",
+    "The Wrex app is running on port 55520 (http://localhost:55520).",
+    "",
     "This machine is your home. You are empowered and responsible for maintaining it —",
     "install packages, configure tools, organize files, and keep things tidy as you see fit.",
+    "",
+    "# Source Code",
+    "",
+    `Your own source code (the Wrex application) lives at: ${appDir}`,
+    "If you need to inspect or modify your own behavior, look there.",
+    "Key paths:",
+    `- \`${appDir}/src/\` — application source (TypeScript)`,
+    `- \`${appDir}/src/lib/claude/\` — your system prompt and chat handler`,
+    `- \`${appDir}/src/lib/claude/system-prompt.ts\` — this system prompt builder`,
+    `- \`${appDir}/drizzle.config.ts\` — database config`,
+    `- \`${appDir}/package.json\` — dependencies and scripts`,
+    "The app runs in hot-reload mode — source changes take effect automatically, no rebuild needed (usually).",
   ];
 }
 
@@ -170,7 +192,7 @@ function workspaceSection(workspaceDir: string): string[] {
 
 export function buildSystemPrompt(params: SystemPromptParams): string {
   const sections = [
-    identitySection(params.workspaceDir),
+    identitySection(),
     operatingContextSection(),
     toolUsageSection(params.toolNames),
     memoryRecallSection(),

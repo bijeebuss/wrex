@@ -10,6 +10,23 @@ import { resolve, join, extname } from 'node:path'
 const workspaceDir = resolve('data/workspace')
 
 // ---------------------------------------------------------------------------
+// User MCP servers template — seeded so Claude CLI auto-discovers them via cwd
+// ---------------------------------------------------------------------------
+
+const USER_MCP_TEMPLATE = JSON.stringify(
+  {
+    mcpServers: {
+      todoist: {
+        command: 'npx',
+        args: ['-y', 'mcp-remote', 'https://ai.todoist.net/mcp'],
+      },
+    },
+  },
+  null,
+  2,
+)
+
+// ---------------------------------------------------------------------------
 // CLAUDE.md template — versioned inline so it ships with the code
 // ---------------------------------------------------------------------------
 
@@ -21,12 +38,13 @@ This is your personal workspace. You have full control over it.
 
 \`\`\`
 data/workspace/
+├── .mcp.json             ← user MCP servers (e.g. todoist) — edit to add/remove
 ├── .claude/
-│   └── CLAUDE.md        ← this file (identity + workspace conventions)
-├── memory/              ← persistent memory files (managed via MCP tools)
-│   ├── user-profile.md  ← who you're talking to
-│   ├── projects.md      ← active projects & context
-│   └── ...              ← any topic-based files you create
+│   └── CLAUDE.md         ← this file (identity + workspace conventions)
+├── memory/               ← persistent memory files (managed via MCP tools)
+│   ├── user-profile.md   ← who you're talking to
+│   ├── projects.md       ← active projects & context
+│   └── ...               ← any topic-based files you create
 \`\`\`
 
 ## Commands
@@ -61,6 +79,12 @@ export function ensureWorkspace(): void {
     console.log('[workspace] Seeded .claude/CLAUDE.md')
   }
 
+  // Seed .mcp.json for user-configured MCP servers (auto-discovered by Claude CLI via cwd)
+  const mcpJsonPath = join(workspaceDir, '.mcp.json')
+  if (!existsSync(mcpJsonPath)) {
+    writeFileSync(mcpJsonPath, USER_MCP_TEMPLATE, 'utf-8')
+    console.log('[workspace] Seeded .mcp.json')
+  }
 }
 
 /**

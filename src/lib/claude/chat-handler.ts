@@ -17,6 +17,7 @@ import { parseNDJSON } from '@/lib/claude/ndjson-parser'
 import { hybridSearch } from '@/lib/memory/search'
 import { buildSystemPrompt } from '@/lib/claude/system-prompt'
 import { hasMemories } from '@/lib/workspace/init'
+import { getBuiltinMcpConfig } from '@/lib/claude/mcp-config'
 import type { ClaudeEvent, SystemEvent, StreamEvent, ResultEvent } from '@/lib/claude/types'
 
 const workspaceDir = path.resolve('data/workspace')
@@ -138,8 +139,8 @@ Start a friendly onboarding conversation to learn about them.
 ${isInitCommand ? '- The user already has memories. Merge new info with existing files rather than overwriting.' : ''}`
     }
 
-    // Resolve MCP config path (always pass for memory tool access)
-    const mcpConfigPath = path.resolve('.mcp.json')
+    // Built-in MCP servers passed inline; user servers discovered via cwd
+    const mcpConfig = getBuiltinMcpConfig()
 
     // Build the system prompt
     const systemPrompt = buildSystemPrompt({ workspaceDir })
@@ -170,7 +171,7 @@ ${isInitCommand ? '- The user already has memories. Merge new info with existing
             resumeSessionId: claudeResumeSessionId,
             systemPrompt,
             appendSystemPrompt: systemPromptAppend || undefined,
-            mcpConfigPath,
+            mcpConfig,
             cwd: workspaceDir,
           })
         } catch (err) {

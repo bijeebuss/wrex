@@ -50,6 +50,13 @@ function ChatMessageInner({ message, onRetry }: ChatMessageProps) {
         {message.toolCalls?.map(tool => (
           <ToolBlock key={tool.id} tool={tool} />
         ))}
+        {message.isStreaming && (
+          <div className="flex gap-1 pt-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 animate-bounce [animation-delay:0ms]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 animate-bounce [animation-delay:150ms]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 animate-bounce [animation-delay:300ms]" />
+          </div>
+        )}
       </div>
     </div>
   )

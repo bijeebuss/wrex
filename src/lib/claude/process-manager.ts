@@ -14,7 +14,7 @@ export class ClaudeProcessManager {
    *
    * @param sessionId - The Wrex session ID (used as map key)
    * @param prompt - The user prompt to send to Claude
-   * @param opts - Optional: resumeSessionId, appendSystemPrompt, mcpConfigPath
+   * @param opts - Optional: resumeSessionId, appendSystemPrompt, mcpConfig
    * @returns The spawned ChildProcess
    */
   spawn(
@@ -24,7 +24,7 @@ export class ClaudeProcessManager {
       resumeSessionId?: string
       appendSystemPrompt?: string
       systemPrompt?: string
-      mcpConfigPath?: string
+      mcpConfig?: string
       cwd?: string
     },
   ): ChildProcess {
@@ -48,8 +48,8 @@ export class ClaudeProcessManager {
       args.push('--append-system-prompt', opts.appendSystemPrompt)
     }
 
-    if (opts?.mcpConfigPath) {
-      args.push('--mcp-config', opts.mcpConfigPath)
+    if (opts?.mcpConfig) {
+      args.push('--mcp-config', opts.mcpConfig)
     }
 
     const child = spawn('claude', args, {

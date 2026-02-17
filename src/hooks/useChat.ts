@@ -70,6 +70,8 @@ export function useChat(opts: UseChatOptions = {}): UseChatReturn {
     let currentBlockType: 'text' | 'tool_use' | null = null
     let pendingText = ''
     let rafScheduled = false
+    // Track whether we got per-message usage (more accurate than aggregate result usage)
+    let gotMessageUsage = false
 
     // Batch text delta updates via requestAnimationFrame
     function flushText() {
@@ -181,6 +183,23 @@ export function useChat(opts: UseChatOptions = {}): UseChatReturn {
             if (event.type === 'stream_event' && event.event) {
               const payload = event.event
 
+              // message_start contains per-API-call usage (actual context window size)
+              // This is more accurate than result.usage which is aggregate across all sub-calls
+              if (payload.type === 'message_start' && payload.message) {
+                const msg = payload.message as Record<string, unknown>
+                const usage = msg.usage as Record<string, number> | undefined
+                if (usage && typeof usage.input_tokens === 'number') {
+                  gotMessageUsage = true
+                  setContextUsage({
+                    inputTokens:
+                      (usage.input_tokens ?? 0) +
+                      (usage.cache_creation_input_tokens ?? 0) +
+                      (usage.cache_read_input_tokens ?? 0),
+                    outputTokens: usage.output_tokens ?? 0,
+                  })
+                }
+              }
+
               // content_block_start
               if (payload.type === 'content_block_start') {
                 currentBlockIndex = payload.index ?? currentBlockIndex + 1
@@ -255,8 +274,10 @@ export function useChat(opts: UseChatOptions = {}): UseChatReturn {
 
             // Result event
             if (event.type === 'result') {
-              // Capture context usage (sum all input token types for true context fill)
-              if (event.usage) {
+              // Only use result.usage as fallback — it's aggregate across all sub-calls
+              // in a turn, so it inflates the number. Per-message usage from message_start
+              // events (captured above) is the actual context window size.
+              if (!gotMessageUsage && event.usage) {
                 const u = event.usage
                 setContextUsage({
                   inputTokens:

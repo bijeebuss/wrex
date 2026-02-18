@@ -24,7 +24,7 @@
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"runArgs": [
-		"-p", "127.0.0.1:55520:55520"
+		"-p", "0.0.0.0:55520:55520"
 	]
 
 

@@ -13,18 +13,14 @@ function useSpeechRecognition(onTranscript: (text: string) => void) {
   const [isListening, setIsListening] = useState(false)
   const [supported, setSupported] = useState(false)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const wantListeningRef = useRef(false)
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
     setSupported(!!SpeechRecognition)
   }, [])
 
-  const toggle = useCallback(() => {
-    if (isListening) {
-      recognitionRef.current?.stop()
-      return
-    }
-
+  const startRecognition = useCallback(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
     if (!SpeechRecognition) return
 
@@ -41,23 +37,46 @@ function useSpeechRecognition(onTranscript: (text: string) => void) {
     }
 
     recognition.onend = () => {
-      setIsListening(false)
       recognitionRef.current = null
+      // Browser kills recognition after silence even with continuous=true.
+      // Auto-restart if the user hasn't explicitly toggled off.
+      if (wantListeningRef.current) {
+        startRecognition()
+      } else {
+        setIsListening(false)
+      }
     }
 
-    recognition.onerror = () => {
-      setIsListening(false)
+    recognition.onerror = (e) => {
+      // "no-speech" is expected during silence — just let onend restart
+      if (e.error === 'no-speech') return
       recognitionRef.current = null
+      wantListeningRef.current = false
+      setIsListening(false)
     }
 
     recognitionRef.current = recognition
     recognition.start()
     setIsListening(true)
-  }, [isListening, onTranscript])
+  }, [onTranscript])
+
+  const toggle = useCallback(() => {
+    if (isListening) {
+      wantListeningRef.current = false
+      recognitionRef.current?.stop()
+      return
+    }
+
+    wantListeningRef.current = true
+    startRecognition()
+  }, [isListening, startRecognition])
 
   // Cleanup on unmount
   useEffect(() => {
-    return () => recognitionRef.current?.stop()
+    return () => {
+      wantListeningRef.current = false
+      recognitionRef.current?.stop()
+    }
   }, [])
 
   return { isListening, supported, toggle }

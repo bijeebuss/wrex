@@ -1,12 +1,17 @@
-import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { useCallback, useMemo, useState } from 'react'
+import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useChat } from '@/hooks/useChat'
 import { ChatMessages } from '@/components/chat/ChatMessages'
 import { ChatInput } from '@/components/chat/ChatInput'
 import { ContextBar } from '@/components/chat/ContextBar'
 import { useTextToSpeech } from '@/hooks/useTextToSpeech'
+import removeMarkdown from 'remove-markdown'
 import { loadSessionMessages } from '@/lib/api/sessions'
 import type { ChatMessage } from '@/types/chat'
+import { useVoiceMode } from '@/lib/voice-mode-context'
+
+// Module-level flag to carry voice mode across navigations
+let pendingVoiceStart = false
 
 export const Route = createFileRoute('/_chat/$sessionId')({
   loader: async ({ params }) => {
@@ -57,23 +62,47 @@ function ChatSessionInner() {
   })
 
   const [isListening, setIsListening] = useState(false)
+  const { setIsVoiceMode } = useVoiceMode()
+  const [autoStartVoice] = useState(() => {
+    if (pendingVoiceStart) {
+      pendingVoiceStart = false
+      return true
+    }
+    return false
+  })
+
+  useEffect(() => {
+    setIsVoiceMode(isListening)
+    return () => setIsVoiceMode(false)
+  }, [isListening, setIsVoiceMode])
 
   // Get the last assistant message's content for TTS
   const lastMsg = messages[messages.length - 1]
-  const ttsContent = lastMsg?.role === 'assistant' ? lastMsg.content : ''
+  const ttsContent = lastMsg?.role === 'assistant' ? removeMarkdown(lastMsg.content) : ''
   const ttsStreaming = lastMsg?.role === 'assistant' && !!lastMsg.isStreaming
 
-  useTextToSpeech(ttsContent, ttsStreaming, isListening)
+  const { cancelAll } = useTextToSpeech(ttsContent, ttsStreaming, isListening)
+
+  const navigate = useNavigate()
+  const handleNewChat = useCallback(() => {
+    if (isListening) {
+      pendingVoiceStart = true
+    }
+    navigate({ to: '/$sessionId', params: { sessionId: crypto.randomUUID() } })
+  }, [navigate, isListening])
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <ChatMessages messages={messages} status={status} memoryContext={memoryContext} onRetry={retryLast} />
+      <ChatMessages messages={messages} status={status} memoryContext={memoryContext} onRetry={retryLast} isVoiceMode={isListening} />
       <ContextBar contextUsage={contextUsage} />
       <ChatInput
         onSend={sendMessage}
         onStop={stopStreaming}
         isStreaming={status === 'streaming'}
         onListeningChange={setIsListening}
+        onStopTTS={cancelAll}
+        onNewChat={handleNewChat}
+        autoStartVoice={autoStartVoice}
       />
     </div>
   )

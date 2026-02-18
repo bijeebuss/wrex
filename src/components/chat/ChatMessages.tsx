@@ -9,13 +9,15 @@ interface ChatMessagesProps {
   status: ChatStatus
   memoryContext?: MemorySnippet[] | null
   onRetry: () => void
+  isVoiceMode?: boolean
 }
 
-export function ChatMessages({ messages, status, memoryContext, onRetry }: ChatMessagesProps) {
+export function ChatMessages({ messages, status, memoryContext, onRetry, isVoiceMode }: ChatMessagesProps) {
   const isStreaming = status === 'streaming'
   const { containerRef, showScrollButton, scrollToBottom, latestMessageRef, topSentinelRef } = useAutoScroll({
     messages,
     isStreaming,
+    isVoiceMode,
   })
 
   // Show loading indicator when streaming and last assistant message has no content yet

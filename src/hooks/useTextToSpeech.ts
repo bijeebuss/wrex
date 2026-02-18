@@ -72,7 +72,7 @@ export function useTextToSpeech(content: string, isStreaming: boolean, enabled: 
       const res = await fetch('/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text, speed: 1.2 }),
         signal: controller.signal,
       })
 
@@ -242,4 +242,6 @@ export function useTextToSpeech(content: string, isStreaming: boolean, enabled: 
       }
     }
   }, [cancelAll])
+
+  return { cancelAll }
 }

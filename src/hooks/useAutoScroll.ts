@@ -4,6 +4,7 @@ import type { ChatMessage } from '../types/chat'
 interface UseAutoScrollOptions {
   messages: ChatMessage[]
   isStreaming: boolean
+  isVoiceMode?: boolean
 }
 
 interface UseAutoScrollReturn {
@@ -14,7 +15,7 @@ interface UseAutoScrollReturn {
   topSentinelRef: React.RefObject<HTMLDivElement | null>
 }
 
-export function useAutoScroll({ messages, isStreaming }: UseAutoScrollOptions): UseAutoScrollReturn {
+export function useAutoScroll({ messages, isStreaming, isVoiceMode }: UseAutoScrollOptions): UseAutoScrollReturn {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const latestMessageRef = useRef<HTMLDivElement | null>(null)
   const topSentinelRef = useRef<HTMLDivElement | null>(null)
@@ -49,7 +50,7 @@ export function useAutoScroll({ messages, isStreaming }: UseAutoScrollOptions): 
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (!entry.isIntersecting && isStreaming) {
+          if (!entry.isIntersecting && isStreaming && !isVoiceMode) {
             isAutoScrollEnabled.current = false
           }
         }
@@ -63,7 +64,7 @@ export function useAutoScroll({ messages, isStreaming }: UseAutoScrollOptions): 
 
     observer.observe(topSentinelRef.current)
     return () => observer.disconnect()
-  }, [messages.length, isStreaming])
+  }, [messages.length, isStreaming, isVoiceMode])
 
   // Detect manual scrolling (user scrolls up during streaming)
   useEffect(() => {
@@ -74,8 +75,8 @@ export function useAutoScroll({ messages, isStreaming }: UseAutoScrollOptions): 
       if (!container) return
       const currentScrollTop = container.scrollTop
 
-      // If user scrolled up during streaming, disable auto-scroll
-      if (isStreaming && currentScrollTop < lastScrollTop.current - 10) {
+      // If user scrolled up during streaming, disable auto-scroll (unless voice mode)
+      if (isStreaming && !isVoiceMode && currentScrollTop < lastScrollTop.current - 10) {
         isAutoScrollEnabled.current = false
       }
 

@@ -7,6 +7,9 @@ interface ChatInputProps {
   isStreaming: boolean
   disabled?: boolean
   onListeningChange?: (listening: boolean) => void
+  onStopTTS?: () => void
+  onNewChat?: () => void
+  autoStartVoice?: boolean
 }
 
 function useSpeechRecognition(onTranscript: (text: string) => void) {
@@ -14,6 +17,10 @@ function useSpeechRecognition(onTranscript: (text: string) => void) {
   const [supported, setSupported] = useState(false)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
   const wantListeningRef = useRef(false)
+  // Keep a ref to always call the latest onTranscript, avoiding stale closures
+  // in the long-lived recognition.onresult callback
+  const onTranscriptRef = useRef(onTranscript)
+  onTranscriptRef.current = onTranscript
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -32,7 +39,7 @@ function useSpeechRecognition(onTranscript: (text: string) => void) {
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       const last = event.results[event.results.length - 1]
       if (last.isFinal) {
-        onTranscript(last[0].transcript)
+        onTranscriptRef.current(last[0].transcript)
       }
     }
 
@@ -58,7 +65,7 @@ function useSpeechRecognition(onTranscript: (text: string) => void) {
     recognitionRef.current = recognition
     recognition.start()
     setIsListening(true)
-  }, [onTranscript])
+  }, []) // onTranscript accessed via ref to avoid stale closures
 
   const toggle = useCallback(() => {
     if (isListening) {
@@ -83,8 +90,11 @@ function useSpeechRecognition(onTranscript: (text: string) => void) {
 }
 
 const SEND_KEYWORD = /\s*send (a )?message\.?$/i
+const CLEAR_MESSAGE = /^\s*clear\s+(the\s+)?message\.?\s*$/i
+const STOP_TALKING = /^\s*stop\s+talking\.?\s*$/i
+const NEW_CHAT = /^\s*start\s+(a\s+)?new\s+chat\.?\s*$/i
 
-export function ChatInput({ onSend, onStop, isStreaming, onListeningChange }: ChatInputProps) {
+export function ChatInput({ onSend, onStop, isStreaming, onListeningChange, onStopTTS, onNewChat, autoStartVoice }: ChatInputProps) {
   const [value, setValue] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const valueRef = useRef('')
@@ -95,9 +105,24 @@ export function ChatInput({ onSend, onStop, isStreaming, onListeningChange }: Ch
   }, [value])
 
   const handleTranscript = useCallback((text: string) => {
+    const trimmed = text.trim()
+
+    if (CLEAR_MESSAGE.test(trimmed)) {
+      setValue('')
+      return
+    }
+    if (STOP_TALKING.test(trimmed)) {
+      onStopTTS?.()
+      return
+    }
+    if (NEW_CHAT.test(trimmed)) {
+      onNewChat?.()
+      return
+    }
+
     const prev = valueRef.current
     const spacer = prev && !prev.endsWith(' ') ? ' ' : ''
-    const combined = prev + spacer + text.trim()
+    const combined = prev + spacer + trimmed
 
     if (SEND_KEYWORD.test(combined)) {
       const message = combined.replace(SEND_KEYWORD, '').trim()
@@ -109,9 +134,17 @@ export function ChatInput({ onSend, onStop, isStreaming, onListeningChange }: Ch
       setValue(combined)
       textareaRef.current?.focus()
     }
-  }, [onSend])
+  }, [onSend, onStopTTS, onNewChat])
 
   const { isListening, supported, toggle } = useSpeechRecognition(handleTranscript)
+  const micButtonRef = useRef<HTMLButtonElement>(null)
+
+  // Auto-start voice mode by clicking the mic button (needs real click for browser trust)
+  useEffect(() => {
+    if (autoStartVoice && supported && !isListening) {
+      micButtonRef.current?.click()
+    }
+  }, [autoStartVoice, supported]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Notify parent of listening state changes (for TTS)
   useEffect(() => {
@@ -153,6 +186,7 @@ export function ChatInput({ onSend, onStop, isStreaming, onListeningChange }: Ch
         />
         {supported && !isStreaming && (
           <button
+            ref={micButtonRef}
             type="button"
             onClick={toggle}
             className={`shrink-0 rounded-full w-10 h-10 flex items-center justify-center transition-colors cursor-pointer ${

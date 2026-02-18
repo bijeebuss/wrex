@@ -1,0 +1,48 @@
+{
+  "expo": {
+    "name": "Wrex",
+    "slug": "wrex",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Wrex needs microphone access for voice input.",
+        "NSSpeechRecognitionUsageDescription": "Wrex uses speech recognition to convert your voice to text."
+      },
+      "bundleIdentifier": "com.anonymous.wrex"
+    },
+    "plugins": [
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Wrex needs microphone access for voice input.",
+          "speechRecognitionPermission": "Wrex uses speech recognition to convert your voice to text."
+        }
+      ]
+    ],
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.anonymous.wrex"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}

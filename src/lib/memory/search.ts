@@ -108,6 +108,21 @@ export async function vectorSearch(
 }
 
 /**
+ * Sanitize a query string for FTS5 MATCH syntax.
+ *
+ * Wraps each token in double quotes so that special characters (quotes,
+ * numbers, operators like AND/OR/NOT) are treated as literals instead of
+ * FTS5 syntax.
+ */
+function sanitizeFts5Query(raw: string): string {
+  // Split on whitespace, drop empty tokens
+  const tokens = raw.split(/\s+/).filter(Boolean);
+  if (tokens.length === 0) return '""';
+  // Escape any internal double quotes, then wrap each token
+  return tokens.map((t) => `"${t.replace(/"/g, '""')}"`).join(" ");
+}
+
+/**
  * Keyword search using FTS5 with BM25 ranking.
  *
  * Executes a full-text search against the fts_memory_chunks table.
@@ -124,6 +139,8 @@ export function keywordSearch(
   ensureTables();
 
   try {
+    const safeQuery = sanitizeFts5Query(query);
+
     // FTS5 MATCH query with BM25 ranking (rank is negative, lower = better)
     const ftsResults = sqlite
       .prepare(
@@ -135,7 +152,7 @@ export function keywordSearch(
         LIMIT ?
       `,
       )
-      .all(query, limit) as { rowid: number; rank: number }[];
+      .all(safeQuery, limit) as { rowid: number; rank: number }[];
 
     if (ftsResults.length === 0) return [];
 

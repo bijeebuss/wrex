@@ -5,6 +5,7 @@ import { ChatMessages } from '@/components/chat/ChatMessages'
 import { ChatInput } from '@/components/chat/ChatInput'
 import { ContextBar } from '@/components/chat/ContextBar'
 import { useTextToSpeech } from '@/hooks/useTextToSpeech'
+import { useProcessingChime } from '@/hooks/useProcessingChime'
 import removeMarkdown from 'remove-markdown'
 import { loadSessionMessages } from '@/lib/api/sessions'
 import type { ChatMessage } from '@/types/chat'
@@ -82,6 +83,7 @@ function ChatSessionInner() {
   const ttsStreaming = lastMsg?.role === 'assistant' && !!lastMsg.isStreaming
 
   const { cancelAll } = useTextToSpeech(ttsContent, ttsStreaming, isListening)
+  useProcessingChime(status === 'streaming', isListening)
 
   const navigate = useNavigate()
   const handleNewChat = useCallback(() => {
